@@ -1,17 +1,43 @@
-import streamlit as st
+import os
+import joblib
 import pandas as pd
 import numpy as np
-import joblib
+import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import datetime
 from sklearn.cluster import KMeans
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import (accuracy_score, precision_score, recall_score,
+                           f1_score, roc_auc_score, confusion_matrix)
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from imblearn.over_sampling import SMOTE
+import xgboost as xgb
 from data_processing_function import preprocess_data
-from train_evaluate_model import train_and_save_churn_model, cluster_churn_reasons,load_model
-
+from train_evaluate_model import train_and_save_churn_model, cluster_churn_reasons, load_model
 
 def main():
     st.title("TelcoGuard Churn Prediction Dashboard")
+
+    # Provide dataset.csv as a downloadable file
+    st.sidebar.header("Download Dataset")
+    dataset_path = "dataset.csv"
+    if os.path.exists(dataset_path):
+        with open(dataset_path, "rb") as file:
+            st.sidebar.download_button(
+                label="Download Dataset",
+                data=file,
+                file_name="dataset.csv",
+                mime="text/csv"
+            )
+    else:
+        st.sidebar.warning("Dataset file not found.")
+
     st.sidebar.header("Upload Dataset")
     uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
     
